@@ -15,10 +15,20 @@ class Hand {
     getTotalValue() {
         let totalValue = 0;
         let numOfAces = 0;
+        const faceCards = ['Jack', 'Queen', 'King'];
         for (let card of this.cards) {
-            totalValue += card.value;
-            if (card.rank === "Ace") {
+            if (faceCards.includes(card.value)){
+                totalValue += 10;
+                console.log("face card:" , `${totalValue}`);
+            }
+            else if (card.value === "Ace"){
                 numOfAces++;
+                totalValue += 11;
+                console.log("ace:" , `${totalValue}`);
+            }
+            else {
+                totalValue += parseInt(card.value);
+                console.log("number:" , `${totalValue}`);
             }
         }
         while (numOfAces > 0 && totalValue > 21) {

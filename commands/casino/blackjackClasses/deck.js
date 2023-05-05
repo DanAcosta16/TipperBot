@@ -4,10 +4,10 @@ class Deck {
     constructor() {
         this.cards = [];
         const suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
-        const ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace'];
+        const values = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King', 'Ace'];
         for (let suit of suits) {
-            for (let rank of ranks) {
-                this.cards.push(new Card(suit, rank));
+            for (let value of values) {
+                this.cards.push(new Card(suit, value));
             }
         }
         console.log("Deck created");
