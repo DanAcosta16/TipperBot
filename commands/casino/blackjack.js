@@ -43,12 +43,16 @@ module.exports = {
         //     )
 
         const lossEmbed = new EmbedBuilder()
-            .setTitle('Bust! You Lose!')
+            .setTitle('You Lose!')
             .setColor('#ff0000')
 
         const winEmbed = new EmbedBuilder()
             .setTitle('Blackjack! You Win!')
             .setColor('#0099ff')
+
+        const pushEmbed = new EmbedBuilder()
+            .setTitle('Push!')
+            .setColor('#FFFF00')
         // let message = await interaction.channel.send({ embeds: [embed] });
 
         // const hit = new ButtonBuilder()
@@ -65,8 +69,8 @@ module.exports = {
         //     .addComponents(hit, stay);
 
         const response = await interaction.reply({ 
-            embeds: [generateEmbed(playerHand, dealerHand)],
-            components: [generateRow()]});
+            embeds: [generateEmbed(interaction, playerHand, dealerHand, false)],
+            components: [generateRow(false)]});
 
         const collectorFilter = i => i.user.id === interaction.user.id; 
 
@@ -79,23 +83,66 @@ module.exports = {
                     playerValue = playerHand.getTotalValue();
                     try {
                         await confirmation.update({ 
-                            embeds: [generateEmbed(playerHand, dealerHand)],
-                            components: [generateRow()] });
+                            embeds: [generateEmbed(interaction, playerHand, dealerHand, false)],
+                            components: [generateRow(false)] });
                     } catch (e) {
                         console.log(e);
                     }
                 }
-                else{
-                    break;
+                else if (confirmation.customId === 'stay') {
+                    dealerValue = dealerHand.getTotalValue();
+                    while(dealerValue < 17) {
+                        dealerHand.addCard(deck.deal());
+                        dealerValue = dealerHand.getTotalValue();
+                    }
+                    if (dealerValue > 21) {
+                        await confirmation.update({
+                            embeds: [generateEmbed(interaction, playerHand, dealerHand, true)],
+                            components: [generateRow(true)] });
+                        await interaction.channel.send({ embeds: [generateMessageEmbed(interaction, 'Dealer Bust! You Win!', '#0099ff')] });
+                        break;
+                    }
+                    else {
+                        playerValue = playerHand.getTotalValue();
+                        if(dealerValue > playerValue){
+                            await confirmation.update({
+                                embeds: [generateEmbed(interaction, playerHand, dealerHand, true)],
+                                components: [generateRow(true)] });
+                            await interaction.channel.send({ embeds: [generateMessageEmbed(interaction, 'You Lose!', '#ff0000')] });
+                        }
+                        else if(dealerValue === playerValue){
+                            await confirmation.update({
+                                embeds: [generateEmbed(interaction, playerHand, dealerHand, true)],
+                                components: [generateRow(true)] });
+                            await interaction.channel.send({ embeds: [generateMessageEmbed(interaction, 'Push!', '#FFFF00')] });
+                        }
+                        else{
+                            await confirmation.update({
+                                embeds: [generateEmbed(interaction, playerHand, dealerHand, true)],
+                                components: [generateRow(true)] });
+                            await interaction.channel.send({ embeds: [generateMessageEmbed(interaction, 'You Win!', '#0099ff')] });
+                        }
+                    }
                 }
             }
 
             if(playerValue > 21) {
-                await interaction.channel.send({ embeds: [lossEmbed] });
+                await interaction.channel.send({ embeds: [generateMessageEmbed(interaction, 'Bust! You Lose!', '#ff0000')] });
+                await response.edit({ components: [generateRow(true)] });
             }
 
             else if (playerValue === 21) {
-                await interaction.channel.send({ embeds: [winEmbed] });
+                dealerValue = dealerHand.getTotalValue();
+                await response.edit({ components: [generateRow(true)] });
+                await interaction.channel.send({
+                    embeds: [generateEmbed(interaction, playerHand, dealerHand, true)],
+                    components: [generateRow(true)]
+                })
+                if(dealerValue === 21) {
+                    await interaction.channel.send({ embeds: [generateMessageEmbed(interaction, 'Push!', '#FFFF00')] });
+                }
+                else
+                    await interaction.channel.send({ embeds: [generateMessageEmbed(interaction, 'Blackjack! You Win!', '#0099ff')] });
             }
 
             // else if(playerValue > 21) {
@@ -136,36 +183,48 @@ function cardToString(card) {
     return `${cardValue}${cardSymbol}`;
 }
 
-function generateEmbed(player, dealer) {
+
+function generateEmbed(interaction, player, dealer, showDealerHand) {
     const playerCards = player.cards.map(cardToString).join(" ");
-    const dealerCards = dealer.cards.map(cardToString).join(" ");
+    const dealerCards = dealer.cards.map((card, index) => showDealerHand || index === 0 ? cardToString(card) : '🂠').join(" ");
+    const dealerValue = showDealerHand ? dealer.getTotalValue() : '??';
+    
     const playerValue = player.getTotalValue();
-    const dealerValue = dealer.getTotalValue();
     const embed = new EmbedBuilder()
         .setTitle('Blackjack')
+        .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
         .setColor('#0099ff')
         .addFields(
             { name: "Player's Hand", value: playerCards, inline: true},
             { name: "Value", value: `${playerValue}`, inline: true},
             { name: "\u200B", value: "\u200B", inline: false },
-            { name: "Dealers's Hand", value: dealerCards, inline: true},
+            { name: "Dealer's Hand", value: dealerCards, inline: true},
             { name: "Value", value: `${dealerValue}`, inline: true},
         )
 
     return embed
 }
 
-function generateRow() {
+function generateMessageEmbed(interaction, title, color) {
+    return new EmbedBuilder()
+        .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
+        .setTitle(title)
+        .setColor(color)
+}
+
+function generateRow(disableButton = false) {
     const row = new ActionRowBuilder()
         .addComponents(
             new ButtonBuilder()
                 .setCustomId('hit')
                 .setLabel('Hit')
-                .setStyle(ButtonStyle.Success),
+                .setStyle(ButtonStyle.Success)
+                .setDisabled(disableButton),
             new ButtonBuilder()
                 .setCustomId('stay')
                 .setLabel('Stay')
                 .setStyle(ButtonStyle.Primary)
+                .setDisabled(disableButton)
         );
     return row;
 }
