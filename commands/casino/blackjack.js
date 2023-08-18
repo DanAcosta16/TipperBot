@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, ActionRowBuilder, EmbedBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { Deck } = require('./blackjackClasses/deck.js');
 const { Hand } = require('./blackjackClasses/hand.js');
+const { Card } = require('./blackjackClasses/card.js');
 
 module.exports = {
 	// cooldown: 5,
@@ -8,14 +9,15 @@ module.exports = {
 		.setName('blackjack')
 		.setDescription('Play a game of Blackjack.'),
 	async execute(interaction) {
-        const cardImagesBaseURL = 'https://deckofcardsapi.com/static/img/';
 		const deck = new Deck();
         deck.shuffle();
         console.log(deck.deal());
 
         const playerHand = new Hand();
-        playerHand.addCard(deck.deal());
-        playerHand.addCard(deck.deal());
+        // playerHand.addCard(deck.deal());
+        // playerHand.addCard(deck.deal());
+        playerHand.addCard(new Card('Hearts', 'Ace'));
+        playerHand.addCard(new Card('Spades', 'Ace'));
 
         const dealerHand = new Hand();
         dealerHand.addCard(deck.deal());
@@ -42,17 +44,6 @@ module.exports = {
         //         { name: "Value", value: `${dealerValue}`, inline: true},
         //     )
 
-        const lossEmbed = new EmbedBuilder()
-            .setTitle('You Lose!')
-            .setColor('#ff0000')
-
-        const winEmbed = new EmbedBuilder()
-            .setTitle('Blackjack! You Win!')
-            .setColor('#0099ff')
-
-        const pushEmbed = new EmbedBuilder()
-            .setTitle('Push!')
-            .setColor('#FFFF00')
         // let message = await interaction.channel.send({ embeds: [embed] });
 
         // const hit = new ButtonBuilder()
@@ -70,13 +61,18 @@ module.exports = {
 
         const response = await interaction.reply({ 
             embeds: [generateEmbed(interaction, playerHand, dealerHand, false)],
-            components: [generateRow(false)]});
+            components: [generateRow(false, true)]});
 
         const collectorFilter = i => i.user.id === interaction.user.id; 
 
         try {
             let playerValue = playerHand.getTotalValue();
             while(playerValue < 21) {
+                if (canSplit(playerHand)) {
+                    response.edit({
+                         embeds: [generateEmbed(interaction, playerHand, dealerHand, false)], 
+                         components: [generateRow(false, false)] });
+                }
                 let confirmation = await response.awaitMessageComponent({ filter: collectorFilter, time: 60000 });
                 if (confirmation.customId === 'hit') {
                     playerHand.addCard(deck.deal());
@@ -99,7 +95,7 @@ module.exports = {
                         await confirmation.update({
                             embeds: [generateEmbed(interaction, playerHand, dealerHand, true)],
                             components: [generateRow(true)] });
-                        await interaction.channel.send({ embeds: [generateMessageEmbed(interaction, 'Dealer Bust! You Win!', '#0099ff')] });
+                        await interaction.channel.send({ embeds: [generateMessageEmbed(interaction, 'Dealer Bust! You Win!', '#00ff00')] });
                         break;
                     }
                     else {
@@ -108,7 +104,7 @@ module.exports = {
                             await confirmation.update({
                                 embeds: [generateEmbed(interaction, playerHand, dealerHand, true)],
                                 components: [generateRow(true)] });
-                            await interaction.channel.send({ embeds: [generateMessageEmbed(interaction, 'You Lose!', '#ff0000')] });
+                            await interaction.channel.send({ embeds: [generateMessageEmbed(interaction, dealerValue === 21 ? 'Dealer Blackjack! You Lose!' : 'You Lose!', '#ff0000')] });
                         }
                         else if(dealerValue === playerValue){
                             await confirmation.update({
@@ -120,7 +116,7 @@ module.exports = {
                             await confirmation.update({
                                 embeds: [generateEmbed(interaction, playerHand, dealerHand, true)],
                                 components: [generateRow(true)] });
-                            await interaction.channel.send({ embeds: [generateMessageEmbed(interaction, 'You Win!', '#0099ff')] });
+                            await interaction.channel.send({ embeds: [generateMessageEmbed(interaction, 'You Win!', '#00ff00')] });
                         }
                     }
                 }
@@ -134,6 +130,10 @@ module.exports = {
             else if (playerValue === 21) {
                 dealerValue = dealerHand.getTotalValue();
                 await response.edit({ components: [generateRow(true)] });
+                while (dealerValue < 17) {
+                    dealerHand.addCard(deck.deal());
+                    dealerValue = dealerHand.getTotalValue();
+                }
                 await interaction.channel.send({
                     embeds: [generateEmbed(interaction, playerHand, dealerHand, true)],
                     components: [generateRow(true)]
@@ -142,7 +142,7 @@ module.exports = {
                     await interaction.channel.send({ embeds: [generateMessageEmbed(interaction, 'Push!', '#FFFF00')] });
                 }
                 else
-                    await interaction.channel.send({ embeds: [generateMessageEmbed(interaction, 'Blackjack! You Win!', '#0099ff')] });
+                    await interaction.channel.send({ embeds: [generateMessageEmbed(interaction, 'Blackjack! You Win!', '#00ff00')] });
             }
 
             // else if(playerValue > 21) {
@@ -212,19 +212,35 @@ function generateMessageEmbed(interaction, title, color) {
         .setColor(color)
 }
 
-function generateRow(disableButton = false) {
+function generateRow(disableButton = false, splitDisabled = true) {
     const row = new ActionRowBuilder()
         .addComponents(
             new ButtonBuilder()
                 .setCustomId('hit')
                 .setLabel('Hit')
-                .setStyle(ButtonStyle.Success)
+                .setStyle(ButtonStyle.Primary)
                 .setDisabled(disableButton),
             new ButtonBuilder()
                 .setCustomId('stay')
                 .setLabel('Stay')
-                .setStyle(ButtonStyle.Primary)
-                .setDisabled(disableButton)
+                .setStyle(ButtonStyle.Success)
+                .setDisabled(disableButton),
+            new ButtonBuilder()
+                .setCustomId('split')
+                .setLabel('Split')
+                .setStyle(ButtonStyle.Danger)
+                .setDisabled(splitDisabled)
         );
     return row;
 }
+
+function canSplit(player) {
+    // Check that the player has exactly two cards
+    if (player.cards.length !== 2) {
+      return false;
+    }
+    
+    // Check that the two cards have the same rank
+    const [card1, card2] = player.cards;
+    return card1.value === card2.value;
+  }
