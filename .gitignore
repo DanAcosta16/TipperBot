@@ -2,3 +2,5 @@ config.json
 node_modules
 package-lock.json
 yarn.lock
+app-env
+database.sqlite

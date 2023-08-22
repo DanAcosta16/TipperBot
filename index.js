@@ -13,6 +13,10 @@ const client = new Client({
     ] 
 });
 
+
+
+
+
 // Create a new Collection
 client.commands = new Collection();
 const foldersPath = path.join(__dirname, 'commands');
