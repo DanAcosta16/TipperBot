@@ -29,7 +29,7 @@ module.exports = {
                 console.log(user.balance);
                 // Update the user's balance
                 await user.update({ balance: amount });
-                await user.save();
+                
 
                 const updatedUser = await Users.findOne({ where: { user_id: targetUser.id } });
                 console.log(updatedUser.balance);
