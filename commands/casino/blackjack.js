@@ -5,7 +5,7 @@ const { Card } = require('./blackjackClasses/card.js');
 const { Users } = require('../../models/dbObjects'); 
 
 module.exports = {
-	// cooldown: 5,
+	cooldown: 10,
 	data: new SlashCommandBuilder()
 		.setName('blackjack')
 		.setDescription('Play a game of Blackjack.')

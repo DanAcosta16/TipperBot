@@ -3,17 +3,27 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
 const { token } = require('./config.json');
+const { REST } = require('@discordjs/rest');
+const { Routes } = require('discord-api-types/v9');
+const { Player } = require('discord-player');
 
 // Create a new client instance
 const client = new Client({ 
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent
+        GatewayIntentBits.MessageContent,
+		GatewayIntentBits.GuildVoiceStates
     ] 
 });
 
 
+global.player = new Player(client, {
+	ytdlOptions: {
+		quality: 'highestaudio',
+		highWaterMark: 1 << 25
+	}
+});
 
 
 
@@ -56,6 +66,8 @@ for (const file of eventFiles) {
 }
 
 client.cooldowns = new Collection();
+
+
 
 // Login to Discord with your client's token
 client.login(token);

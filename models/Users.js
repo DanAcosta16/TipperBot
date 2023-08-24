@@ -9,6 +9,16 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: 500,
             allowNull: false,
         },
+        last_daily_claim: {
+            type: DataTypes.DATE,
+            defaultValue: DataTypes.NOW,
+            allowNull: false,
+        },
+        last_weekly_claim: {
+            type: DataTypes.DATE,
+            defaultValue: DataTypes.NOW,
+            allowNull: false,
+        },
     
     });
 };
