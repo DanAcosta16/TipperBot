@@ -1,5 +1,6 @@
 const { Events, EmbedBuilder} = require('discord.js');
 const { clientId } = require('../config.json');
+// const clientId = process.env['clientId'];
 const { Users } = require('../models/dbObjects');
 
 module.exports = {

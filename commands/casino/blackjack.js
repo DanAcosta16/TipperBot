@@ -54,12 +54,12 @@ module.exports = {
             dealerHand.addCard(deck.deal());
             dealerHand.addCard(deck.deal());
     
-            const result = await playGameLogic(playerHand, dealerHand, deck, interaction, double);
-            console.log('result', result);
+            let result = await playGameLogic(playerHand, dealerHand, deck, interaction, double);
+            result[1] = true;
             //if result is win add to balance and send message
             if (result[0] === 'win') {
                 let winnings;
-                if (result[1] === 'true') {
+                if (result[1] === true) {
                     winnings = bet * 2;
                     await user.increment('balance', { by: winnings});
                 }
@@ -78,7 +78,7 @@ module.exports = {
                 await interaction.channel.send({ embeds: [embed] });
             } else if (result[0] === 'loss') {
                 let losses;
-                if (result[1] === 'true') {
+                if (result[1] === true) {
                     losses = bet * 2;
                     await user.decrement('balance', { by: bet * 2 });
                 }
