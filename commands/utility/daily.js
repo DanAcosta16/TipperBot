@@ -2,6 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Users } = require('../../models/dbObjects'); 
 
 module.exports = {
+    cooldown: 86400,
     data: new SlashCommandBuilder()
         .setName('daily')
         .setDescription('Receive a daily bonus!'),
@@ -15,30 +16,15 @@ module.exports = {
 
             if (user) {
                 console.log(user.balance);
-                const now = Date.now();
+                
+                await user.increment('balance', { by: 500 });
+                await user.reload();
+                const embed = new EmbedBuilder()
+                .setColor('#00FF00')
+                .setTitle(`Daily bonus received! +$500`)
+                .setDescription(`Balance: $${user.balance}`);
 
-                const lastDailyClaim = user.last_daily_claim;
-                const timeSinceLastDailyClaim = now - lastDailyClaim;
-                const oneDay = 24 * 60 * 60 * 1000;
-                if (timeSinceLastDailyClaim > oneDay) {
-                    await user.increment('balance', { by: 500 });
-                    user.last_daily_claim = now;
-                    await user.reload();
-                    const embed = new EmbedBuilder()
-                    .setColor('#00FF00')
-                    .setTitle(`Daily bonus received! +$500`)
-                    .setDescription(`Balance: $${user.balance}`);
-
-                    await interaction.editReply({ embeds: [embed] });
-                } else {
-                    const timeUntilCooldown = oneDay - timeSinceLastDailyClaim;
-                    const timeUntilCooldownInHours = Math.round(timeUntilCooldown / 1000 / 60 / 60);
-                    const embed = new EmbedBuilder()
-                    .setColor('#FF0000')
-                    .setTitle('Error')
-                    .setDescription('You have already received a daily bonus today. You will receive it again in ' + timeUntilCooldownInHours + ' hours.');
-                    await interaction.editReply({ embeds: [embed] });
-                }
+                await interaction.editReply({ embeds: [embed] });
                 
             } else {
                 const embed = new EmbedBuilder()

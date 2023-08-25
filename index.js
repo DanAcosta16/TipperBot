@@ -26,7 +26,6 @@ global.player = new Player(client, {
 });
 
 
-
 // Create a new Collection
 client.commands = new Collection();
 const foldersPath = path.join(__dirname, 'commands');

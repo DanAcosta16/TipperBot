@@ -22,9 +22,10 @@ module.exports = {
         }
 
         let queue = useQueue(interaction.guildId);
+        const player = useMainPlayer(interaction.guildId);
         let url = interaction.options.getString('url');
         
-        const player = useMainPlayer(interaction.guildId);
+        
         await player.extractors.loadDefault();
         let searchResult;
         try {
@@ -63,10 +64,10 @@ module.exports = {
                 requestedBy: interaction.user,
                 nodeOptions: {
                     leaveOnEnd: true,
-                    leaveOnEndCooldown: 300000,
+                    leaveOnEndCooldown: 3000,
                     leaveOnStop: true,
                     leaveOnStopCooldown: 300000,
-                    maxSize: 1000,
+                    maxSize: 50,
                     maxHistorySize: 100,
                     volume: 100,
                     connectionTimeout: 600000,

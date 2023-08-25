@@ -9,7 +9,13 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('blackjack')
 		.setDescription('Play a game of Blackjack.')
-        .addIntegerOption(option => option.setName('amount').setDescription('Enter the bet amount').setRequired(true)),
+        .addIntegerOption((option) => 
+            option
+            .setName('amount')
+            .setDescription('Enter the bet amount')
+            .setRequired(true)
+            .setMinValue(50)
+        ),
 	async execute(interaction) {
         let double = false;
         await interaction.deferReply();
@@ -26,15 +32,7 @@ module.exports = {
                 await interaction.editReply({ embeds: [embed] });
                 return;
             }
-            else if (bet < 1) {
-                const embed = new EmbedBuilder()
-                        .setColor('#FF0000')
-                        .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
-                        .setTitle(`You must bet at least $1.`)
-                        .setDescription(`Balance: $${user.balance}`);
-                await interaction.editReply({ embeds: [embed] });
-                return;
-            }
+            
             if (user.balance > (bet * 2)) {
                 double = true;
             }
@@ -60,34 +58,40 @@ module.exports = {
             console.log('result', result);
             //if result is win add to balance and send message
             if (result[0] === 'win') {
+                let winnings;
                 if (result[1] === 'true') {
-                    await user.increment('balance', { by: bet * 2 });
+                    winnings = bet * 2;
+                    await user.increment('balance', { by: winnings});
                 }
                 else {
-                    await user.increment('balance', { by: bet});
+                    winnings = bet;
+                    await user.increment('balance', { by: winnings});
                 }
                 
                 await user.reload();
                 const embed = new EmbedBuilder()
                         .setColor('#00FF00')
                         .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
-                        .setTitle(`Current Balance`)
-                        .setDescription(`$${user.balance}`);
+                        .setTitle(`+$${winnings}`)
+                        .setDescription(`Current Balance: $${user.balance}`);
     
                 await interaction.channel.send({ embeds: [embed] });
             } else if (result[0] === 'loss') {
+                let losses;
                 if (result[1] === 'true') {
+                    losses = bet * 2;
                     await user.decrement('balance', { by: bet * 2 });
                 }
                 else {
+                    losses = bet;
                     await user.decrement('balance', { by: bet});
                 }
                 await user.reload();
                 const embed = new EmbedBuilder()
                         .setColor('#FF0000')
                         .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
-                        .setTitle(`Current Balance`)
-                        .setDescription(`$${user.balance}`);
+                        .setTitle(`-$${losses}`)
+                        .setDescription(`Current Balance: $${user.balance}`);
                 await interaction.channel.send({ embeds: [embed] });
             } else if (result[0] === 'push') {
                 const embed = new EmbedBuilder()
