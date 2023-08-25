@@ -8,7 +8,6 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             defaultValue: 500,
             allowNull: false,
-        },
-    
+        }
     });
 };

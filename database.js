@@ -8,11 +8,15 @@ const seqeulize = new Sequelize('database', 'username', 'password', {
     storage: 'database.sqlite',
 });
 
-require('./models/Users.js')(seqeulize, Sequelize.DataTypes);
+const Users = require('./models/Users.js')(seqeulize, Sequelize.DataTypes);
 
-const force = process.argv.includes('--force') || process.argv.includes('-f');
+// const force = process.argv.includes('--force') || process.argv.includes('-f');
 
-seqeulize.sync({ force }).then(async () => {
-    console.log('Database synced!');
-    seqeulize.close();
-})
+// Users.sync({ force }).then(async () => {
+//     console.log('Database synced!');
+// })
+
+Users.sync({ alter: true });
+console.log('Users synced!');
+
+module.exports = seqeulize;
