@@ -38,7 +38,7 @@ module.exports = {
             }
             const deck = new Deck();
             deck.shuffle();
-            console.log(deck.deal());
+            // console.log(deck.deal());
     
             const playerHand = new Hand();
             playerHand.addCard(deck.deal());
@@ -55,7 +55,6 @@ module.exports = {
             dealerHand.addCard(deck.deal());
     
             let result = await playGameLogic(playerHand, dealerHand, deck, interaction, double);
-            result[1] = true;
             //if result is win add to balance and send message
             if (result[0] === 'win') {
                 let winnings;
