@@ -1,12 +1,12 @@
 // Require the necessary discord.js classes
 const fs = require('node:fs');
 const path = require('node:path');
-const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, EmbedBuilder } = require('discord.js');
 const { token } = require('./config.json');
 // const token = process.env['token'];
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
-const { Player } = require('discord-player');
+const { useMainPlayer, Player } = require('discord-player');
 
 // Create a new client instance
 const client = new Client({ 
@@ -19,12 +19,19 @@ const client = new Client({
 });
 
 
-global.player = new Player(client, {
-	ytdlOptions: {
-		quality: 'highestaudio',
-		highWaterMark: 1 << 25
-	}
-});
+const player = new Player(client);
+
+player.events.on('playerStart', (queue, track) => {
+	const durationFormat = track.raw.duration === 0 || track.duration === '0:00' ? '' : `\`${track.duration}\``;
+	const embed = new EmbedBuilder()
+		.setColor('#00FF00')
+		.setDescription(
+			`**Started playing**\n**${durationFormat} [${track.title}](${track.url})**`
+		)
+		.setThumbnail(track.thumbnail)
+
+	queue.metadata.send({ embeds: [embed] });
+})
 
 
 // Create a new Collection
@@ -72,4 +79,4 @@ client.cooldowns = new Collection();
 // Login to Discord with your client's token
 client.login(token);
 
-module.exports = client;
+module.exports = client, player;
