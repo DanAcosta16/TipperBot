@@ -93,7 +93,7 @@ module.exports = {
                 if(fiveEmojisInARow) {
                     const scenario = 'fiveinrow';
                     const multiplier = payoutMatrix[fiveEmojisInARow][scenario];
-                    const winnings = (bet * multiplier) - bet;
+                    const winnings = Math.floor(bet * multiplier) - bet;
                     await user.increment('balance', { by: winnings });
                     await user.reload();
 
@@ -109,7 +109,7 @@ module.exports = {
                 else if (fourEmojisInARow) {
                     const scenario = 'fourinrow';
                     const multiplier = payoutMatrix[fourEmojisInARow][scenario];
-                    const winnings = (bet * multiplier) - bet;
+                    const winnings = Math.floor(bet * multiplier) - bet;
                     await user.increment('balance', { by: winnings });
                     await user.reload();
 
@@ -124,7 +124,7 @@ module.exports = {
                         const threeInRowScenario = 'threeinrow';
                         const twoInRowScenario = 'twoinrow';
                         const multiplier = payoutMatrix[threeEmojisInARow][threeInRowScenario] + payoutMatrix[twoEmojisInARow][twoInRowScenario];
-                        const winnings = (bet * multiplier) - bet;
+                        const winnings = Math.floor(bet * multiplier) - bet;
                         await user.increment('balance', { by: winnings });
                         await user.reload();
 
@@ -144,7 +144,7 @@ module.exports = {
                     else {
                         const scenario = 'threeinrow';
                         const multiplier = payoutMatrix[threeEmojisInARow][scenario];
-                        const winnings = (bet * multiplier) - bet;
+                        const winnings = Math.floor(bet * multiplier) - bet;
                         await user.increment('balance', { by: winnings });
                         await user.reload();
 
@@ -167,7 +167,7 @@ module.exports = {
                         const firstPairScenario = 'twoinrow';
                         const secondPairScenario = 'twoinrow';
                         const multiplier = payoutMatrix[twoPairEmojis[0]][firstPairScenario] + payoutMatrix[twoPairEmojis[1]][secondPairScenario];
-                        const winnings = (bet * multiplier) - bet;
+                        const winnings = Math.floor(bet * multiplier) - bet;
                         await user.increment('balance', { by: winnings });
                         await user.reload();
 
@@ -187,7 +187,7 @@ module.exports = {
                     else {
                         const scenario = 'twoinrow';
                         const multiplier = payoutMatrix[twoEmojisInARow][scenario];
-                        const winnings = (bet * multiplier) - bet;
+                        const winnings = Math.floor(bet * multiplier) - bet;
                         await user.increment('balance', { by: winnings });
                         await user.reload();
 
