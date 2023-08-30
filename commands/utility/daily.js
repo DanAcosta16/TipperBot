@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Users } = require('../../models/dbObjects'); 
+const { updateFinancialStatus } = require('../../helperfunctions/updateFinancialStatus');
 
 module.exports = {
     cooldown: 10,
@@ -15,6 +16,14 @@ module.exports = {
             const user = await Users.findOne({ where: { user_id: userId } });
 
             if (user) {
+                if (user.isInJail) {
+                    const embed = new EmbedBuilder()
+                        .setColor('#FF0000')
+                        .setTitle('Error')
+                        .setDescription('You cannot receive a daily bonus while in jail.');
+                    await interaction.followUp({ embeds: [embed] });
+                    return;
+                }
                 console.log(user.balance);
                 const now = Date.now();
 
@@ -28,9 +37,10 @@ module.exports = {
                     await user.reload();
                     const embed = new EmbedBuilder()
                     .setColor('#00FF00')
-                    .setTitle(`Daily bonus received! +$500`)
+                    .setTitle(`Daily bonus received! +500 tipperbucks`)
                     .setDescription(`Balance: $${user.balance}`);
                     await interaction.followUp({ embeds: [embed] });
+                    await updateFinancialStatus(interaction);
                 } else {
                     const timeUntilCooldown = oneDay - timeSinceLastClaim;
                     const timeUntilCooldownInHours = Math.round(timeUntilCooldown / 1000 / 60 / 60);

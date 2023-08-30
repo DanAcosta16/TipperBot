@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Users } = require('../../models/dbObjects');
-
+const { updateFinancialStatus } = require('../../helperfunctions/updateFinancialStatus');
 module.exports = {
     cooldown: 5,
     data: new SlashCommandBuilder()
@@ -23,12 +23,19 @@ module.exports = {
         try {
 
             if(user){
-
+                if (user.isInJail) {
+                    const embed = new EmbedBuilder()
+                        .setColor('#FF0000')
+                        .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
+                        .setTitle(`You can't play Slots while you're in jail.`)
+                    await interaction.editReply({ embeds: [embed] });
+                    return;
+                }
                 if (user.balance < bet) {
                     const embed = new EmbedBuilder()
                         .setColor('#FF0000')
                         .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
-                        .setTitle(`You don't have enough money.`)
+                        .setTitle(`You don't have enough tipperbucks.`)
                         .setDescription(`Balance: $${user.balance}`);
                     await interaction.editReply({ embeds: [embed] });
                     return;
@@ -85,6 +92,7 @@ module.exports = {
                         'fourinrow' : 40,
                         'fiveinrow' : 100,
                     }
+                
                 }
                 
 
@@ -96,6 +104,8 @@ module.exports = {
                     const winnings = Math.floor(bet * multiplier) - bet;
                     await user.increment('balance', { by: winnings });
                     await user.reload();
+                    
+                    
 
                     embed.setTitle(`Jackpot! +$${winnings}`);
                     embed.setDescription(`Current Balance: $${user.balance}`);
@@ -103,7 +113,7 @@ module.exports = {
                     embed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                     
                     await interaction.followUp({ embeds: [embed] });
-                    
+                    await updateFinancialStatus(interaction);
 
                 }
                 else if (fourEmojisInARow) {
@@ -112,12 +122,14 @@ module.exports = {
                     const winnings = Math.floor(bet * multiplier) - bet;
                     await user.increment('balance', { by: winnings });
                     await user.reload();
-
+                    
                     embed.setTitle(`You win! Four in a row! +$${winnings}`);
                     embed.setDescription(`Current Balance: $${user.balance}`);
                     embed.setColor('#00FF00');
                     embed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                     await interaction.followUp({ embeds: [embed] });
+                    await updateFinancialStatus(interaction);
+                    
                 }
                 else if (threeEmojisInARow) {
                     if (twoEmojisInARow) {
@@ -127,7 +139,7 @@ module.exports = {
                         const winnings = Math.floor(bet * multiplier) - bet;
                         await user.increment('balance', { by: winnings });
                         await user.reload();
-
+                        
                         if(winnings >= 0) {
                             embed.setTitle(`You win! Full House! +$${winnings}`);
                             embed.setColor('#00FF00');
@@ -140,6 +152,7 @@ module.exports = {
                         
                         embed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                         await interaction.followUp({ embeds: [embed] });
+                        await updateFinancialStatus(interaction);
                     }
                     else {
                         const scenario = 'threeinrow';
@@ -147,6 +160,7 @@ module.exports = {
                         const winnings = Math.floor(bet * multiplier) - bet;
                         await user.increment('balance', { by: winnings });
                         await user.reload();
+                        
 
                         if(winnings >= 0) {
                             embed.setTitle(`You win! Three in a row! +$${winnings}`);
@@ -160,6 +174,7 @@ module.exports = {
                         
                         embed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                         await interaction.followUp({ embeds: [embed] });
+                        await updateFinancialStatus(interaction);
                     }
                 }
                 else if (twoEmojisInARow) {
@@ -170,6 +185,7 @@ module.exports = {
                         const winnings = Math.floor(bet * multiplier) - bet;
                         await user.increment('balance', { by: winnings });
                         await user.reload();
+                        
 
                         if(winnings >= 0) {
                             embed.setTitle(`You win! Two pair! +$${winnings}`);
@@ -183,6 +199,7 @@ module.exports = {
                         embed.setDescription(`Current Balance: $${user.balance}`);
                         embed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                         await interaction.followUp({ embeds: [embed] });
+                        await updateFinancialStatus(interaction);
                     }
                     else {
                         const scenario = 'twoinrow';
@@ -190,7 +207,7 @@ module.exports = {
                         const winnings = Math.floor(bet * multiplier) - bet;
                         await user.increment('balance', { by: winnings });
                         await user.reload();
-
+                         
                         if(winnings >= 0) {
                             embed.setTitle(`You win! Two in a row! +$${winnings}`);
                             embed.setColor('#00FF00');
@@ -202,17 +219,20 @@ module.exports = {
                         embed.setDescription(`Current Balance: $${user.balance}`);
                         embed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                         await interaction.followUp({ embeds: [embed] });
+                        await updateFinancialStatus(interaction);
                     }
                 }
                 else {
                     await user.decrement('balance', { by: bet });
                     await user.reload();
+                    
 
                     embed.setTitle(`You lose! -$${bet}`);
                     embed.setDescription(`Current Balance: $${user.balance}`);
                     embed.setColor('#FF0000');
                     embed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                     await interaction.followUp({ embeds: [embed] });
+                    await updateFinancialStatus(interaction);
                 }
                 }
             // Generate the slots result

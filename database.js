@@ -16,6 +16,11 @@ const Users = require('./models/Users.js')(seqeulize, Sequelize.DataTypes);
 //     console.log('Database synced!');
 // })
 
+
+
+
+
+
 Users.sync({ alter: true });
 console.log('Users synced!');
 

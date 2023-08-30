@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('discord.js');
 const { Users } = require('../../models/dbObjects'); // Adjust the path to your dbInit.js file
 const { EmbedBuilder } = require('discord.js');
 const { devId } = require('../../config.json');
+const { updateFinancialStatus } = require('../../helperfunctions/updateFinancialStatus');
 // const devId = process.env['devId'];
 
 
@@ -30,7 +31,7 @@ module.exports = {
                 console.log(user.balance);
                 // Update the user's balance
                 await user.update({ balance: amount });
-                
+                await user.reload();
 
                 const updatedUser = await Users.findOne({ where: { user_id: targetUser.id } });
                 console.log(updatedUser.balance);
@@ -42,6 +43,7 @@ module.exports = {
                     .setDescription(`Balance for ${targetUser.tag} has been set to $${user.balance}.`);
 
                 await interaction.reply({ embeds: [embed] });
+                await updateFinancialStatus(interaction, [targetUser]);
             } else {
                 const embed = new EmbedBuilder()
                     .setColor('#FF0000')

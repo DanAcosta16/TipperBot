@@ -2,7 +2,7 @@ const { Events, EmbedBuilder} = require('discord.js');
 const { clientId } = require('../config.json');
 // const clientId = process.env['clientId'];
 const { Users } = require('../models/dbObjects');
-
+const { updateFinancialStatus } = require('../helperfunctions/updateFinancialStatus');
 module.exports = {
 	name: Events.MessageCreate,
 	async execute(message) {
@@ -47,6 +47,7 @@ module.exports = {
                             .setDescription(`Current Balance: $${user.balance}`);
 
                         await message.channel.send({ embeds: [embed] });
+                        await updateFinancialStatus(interaction);
                     }
                 } catch (error) {
                     console.error('Error fetching balance:', error);

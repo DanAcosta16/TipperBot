@@ -16,4 +16,7 @@ const Users = require('./Users.js')(sequelize, Sequelize.DataTypes);
 
 
 
+
+
+
 module.exports = { Users };

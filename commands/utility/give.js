@@ -1,13 +1,14 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { Users } = require('../../models/dbObjects');
 const { EmbedBuilder } = require('discord.js');
+const { updateFinancialStatus } = require('../../helperfunctions/updateFinancialStatus');
 
 
 module.exports = {
     cooldown: 10,
     data: new SlashCommandBuilder()
         .setName('give')
-        .setDescription('Give money to a user')
+        .setDescription('Give tipperbucks to a user')
         .addUserOption(option => option.setName('user').setDescription('Select the user').setRequired(true))
         .addIntegerOption((option) => 
             option
@@ -17,6 +18,7 @@ module.exports = {
             .setMinValue(1)
         ),
     async execute(interaction) {
+        
         const giver = interaction.user;
         const receiver = interaction.options.getUser('user');
         const amount = interaction.options.getInteger('amount');
@@ -30,8 +32,8 @@ module.exports = {
                 const embed = new EmbedBuilder()
                     .setColor('#FF0000')
                     .setTitle('Error')
-                    .setDescription(`You can't give money to yourself.`);
-                await interaction.reply({ embeds: [embed] });
+                    .setDescription(`You can't give tipperbucks to yourself.`);
+                    await interaction.reply({ embeds: [embed]});
                 return;
             }
 
@@ -40,7 +42,7 @@ module.exports = {
                     .setColor('#FF0000')
                     .setTitle('User Not Found')
                     .setDescription(`User ${giver.tag} is not registered.`);
-                await interaction.reply({ embeds: [embed] });
+                await interaction.reply({ embeds: [embed]});
                 return;
             }
     
@@ -49,7 +51,7 @@ module.exports = {
                     .setColor('#FF0000')
                     .setTitle('User Not Found')
                     .setDescription(`User ${receiver.tag} is not registered.`);
-                await interaction.reply({ embeds: [embed] });
+                await interaction.reply({ embeds: [embed]});
                 return;
             }
     
@@ -58,7 +60,25 @@ module.exports = {
                     .setColor('#FF0000')
                     .setTitle('Insufficient Funds')
                     .setDescription(`Balance: $${giverUser.balance}`);
-                await interaction.reply({ embeds: [embed] });
+                await interaction.reply({ embeds: [embed]});
+                return;
+            }
+
+            if (receiverUser.isInJail) {
+                const embed = new EmbedBuilder()
+                    .setColor('#FF0000')
+                    .setTitle('Error')
+                    .setDescription(`User ${receiver.tag} is in jail.`);
+                await interaction.reply({ embeds: [embed]});
+                return;
+            }
+
+            if (giverUser.isInJail) {
+                const embed = new EmbedBuilder()
+                    .setColor('#FF0000')
+                    .setTitle('Error')
+                    .setDescription(`User ${giver.tag} is in jail.`);
+                await interaction.reply({ embeds: [embed]});
                 return;
             }
     
@@ -71,16 +91,18 @@ module.exports = {
                 .setColor('#00FF00')
                 .setTitle('Money Given')
                 .setDescription(`${giver.tag}\'s Balance: $${giverUser.balance}\n${receiver.tag}\'s Balance: $${receiverUser.balance}`);
-            await interaction.reply({ embeds: [embed] });
+            await interaction.reply({ embeds: [embed]});
+
+            await updateFinancialStatus(interaction, [giver, receiver]);
 
         } catch (error) {
             console.error('Error giving money:', error);
             const embed = new EmbedBuilder()
                 .setColor('#FF0000')
                 .setTitle('Error')
-                .setDescription('An error occurred while giving money.');
+                .setDescription('An error occurred while giving tipperbucks.');
 
-            await interaction.reply({ embeds: [embed] });
+            await interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
     }

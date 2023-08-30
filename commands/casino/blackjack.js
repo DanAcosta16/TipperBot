@@ -3,6 +3,7 @@ const { Deck } = require('./blackjackClasses/deck.js');
 const { Hand } = require('./blackjackClasses/hand.js');
 const { Card } = require('./blackjackClasses/card.js');
 const { Users } = require('../../models/dbObjects'); 
+const { updateFinancialStatus } = require('../../helperfunctions/updateFinancialStatus.js');
 
 module.exports = {
 	cooldown: 10,
@@ -22,11 +23,19 @@ module.exports = {
         const user = await Users.findOne({ where: { user_id: interaction.user.id } });
         const bet = interaction.options.getInteger('amount');
         if (user){
+            if (user.isInJail) {
+                const embed = new EmbedBuilder()
+                        .setColor('#FF0000')
+                        .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
+                        .setTitle(`You can't play Blackjack while you're in jail.`)
+                await interaction.editReply({ embeds: [embed] });
+                return;
+            }
             if (user.balance < bet) {
                 const embed = new EmbedBuilder()
                         .setColor('#FF0000')
                         .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
-                        .setTitle(`You don't have enough money.`)
+                        .setTitle(`You don't have enough tipperbucks.`)
                         .setDescription(`Balance: $${user.balance}`);
     
                 await interaction.editReply({ embeds: [embed] });
@@ -75,6 +84,7 @@ module.exports = {
                         .setDescription(`Current Balance: $${user.balance}`);
     
                 await interaction.channel.send({ embeds: [embed] });
+                await updateFinancialStatus(interaction);
             } else if (result[0] === 'loss') {
                 let losses;
                 if (result[1] === true) {
@@ -92,6 +102,7 @@ module.exports = {
                         .setTitle(`-$${losses}`)
                         .setDescription(`Current Balance: $${user.balance}`);
                 await interaction.channel.send({ embeds: [embed] });
+                await updateFinancialStatus(interaction);
             } else if (result[0] === 'push') {
                 const embed = new EmbedBuilder()
                         .setColor('#00FF00')
