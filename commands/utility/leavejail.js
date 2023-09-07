@@ -17,7 +17,7 @@ module.exports = {
             const userRecord = await Users.findOne({ where: { user_id: user.id } });
 
             if(userRecord){
-
+                
                 if(!userRecord.isInJail){
                     const embed = new EmbedBuilder()
                         .setColor('#FF0000')
@@ -33,6 +33,9 @@ module.exports = {
                 const sentence = (1000 * 60 * 60 * 24) * userRecord.sentence_length;
                 if (timeSinceInitialJail > sentence) {
                     await userRecord.update({ isInJail: false });
+                    if (userRecord.active_debuff === 'Tome') {
+                        userRecord.update({ active_debuff: null });
+                    }
                     await userRecord.reload();
                     const embedEphemeral = new EmbedBuilder()
                         .setColor('#00FF00')
@@ -47,7 +50,10 @@ module.exports = {
                     return;
                 }
 
-                const bailAmount = Math.ceil(userRecord.balance * 0.7);
+                let bailAmount = Math.ceil(userRecord.balance * 0.4);
+                if(userRecord.active_debuff === 'Tome'){
+                    bailAmount = Math.ceil(bailAmount * 2);
+                }
                 const timeUntilRelease = sentence - timeSinceInitialJail;
                 const timeUntilReleaseInDays = Math.round(timeUntilRelease / 1000 / 60 / 60 / 24);
                 if (bailAmount < 1000) {
@@ -82,6 +88,9 @@ module.exports = {
                         
                 if (confirmation.customId === 'pay_yes') {
                     await userRecord.update({ balance: userRecord.balance - bailAmount, isInJail: false });
+                    if (userRecord.active_debuff === 'Tome') {
+                        userRecord.update({ active_debuff: null });
+                    }
                     await userRecord.reload();
                     await confirmation.update({ embeds: [embed], components: [] });
                     await updateFinancialStatus(interaction);

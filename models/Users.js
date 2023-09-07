@@ -47,7 +47,22 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             allowNull: true,
             defaultValue: 0
+        },
+        active_buff: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            defaultValue: null
+        },
+        active_debuff: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            defaultValue: null
+        },
+        last_robber_id: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            defaultValue: null
         }
-    }
+    }, { timestamps: false } 
     );
 };

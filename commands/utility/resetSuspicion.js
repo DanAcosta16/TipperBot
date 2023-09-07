@@ -1,7 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { Users } = require('../../models/dbObjects');
 const { EmbedBuilder } = require('discord.js');
-const { devId } = require('../../config.json');
 // const devId = process.env['devId'];
 
 module.exports = {
@@ -12,7 +11,7 @@ module.exports = {
         .addUserOption(option => option.setName('user').setDescription('Select the user').setRequired(true)),
 
     async execute(interaction) {
-        if (interaction.user.id !== devId) {
+        if (interaction.user.id !== '175086920513093633') {
             await interaction.reply('You are not allowed to use this command.');
             return;
         }

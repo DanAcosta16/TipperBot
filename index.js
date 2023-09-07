@@ -25,7 +25,7 @@ const client = new Client({
 // ... Other imports and setup code ...
 
 // Run the task once a day at midnight
-cron.schedule('2 2 * * *', async () => {
+cron.schedule('0 5 * * *', async () => {
     try {
         // Find all users in the database
         const users = await Users.findAll();

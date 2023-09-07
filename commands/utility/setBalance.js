@@ -1,7 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { Users } = require('../../models/dbObjects'); // Adjust the path to your dbInit.js file
 const { EmbedBuilder } = require('discord.js');
-const { devId } = require('../../config.json');
 const { updateFinancialStatus } = require('../../helperfunctions/updateFinancialStatus');
 // const devId = process.env['devId'];
 
@@ -15,7 +14,7 @@ module.exports = {
 
     async execute(interaction) {
         // Check if the user using the command is the allowed user
-        if (interaction.user.id !== devId) {
+        if (interaction.user.id !== '175086920513093633') {
             await interaction.reply('You are not allowed to use this command.');
             return;
         }

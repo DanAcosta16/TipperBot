@@ -20,6 +20,16 @@ module.exports = {
         const user = await Users.findOne({ where: { user_id: interaction.user.id } });
         const bet = interaction.options.getInteger('amount');
 
+        if (!user) {
+            const embed = new EmbedBuilder()
+                .setColor('#FF0000')
+                .setTitle('User Not Found')
+                .setDescription(`User ${interaction.user.id} is not registered.`);
+
+            await interaction.editReply({ embeds: [embed] });
+            return;
+        }
+
         try {
 
             if(user){
@@ -53,44 +63,44 @@ module.exports = {
                     '<:reddit:1101329646655651921>': {
                         'twoinrow' : 0.25,
                         'threeinrow' : 0.5,
-                        'fourinrow' : 1.5,
-                        'fiveinrow' : 8,
+                        'fourinrow' : 3,
+                        'fiveinrow' : 15,
                     },
                     '<:amogus:847263523537289236>': {
                         'twoinrow' : 0.25,
                         'threeinrow' : 0.5,
-                        'fourinrow' : 1.5,
-                        'fiveinrow' : 8,
+                        'fourinrow' : 3,
+                        'fiveinrow' : 15,
                     },
                     '<:gug:1051031219011330098>': {
                         'twoinrow' : 0.5,
                         'threeinrow' : 1,
-                        'fourinrow' : 2,
-                        'fiveinrow' : 8.5,
+                        'fourinrow' : 6,
+                        'fiveinrow' : 30,
                     },
                     '<:cheers:1050202826019700766>': {
                         'twoinrow' : 1,
                         'threeinrow' : 2,
-                        'fourinrow' : 5,
-                        'fiveinrow' : 13,
+                        'fourinrow' : 12,
+                        'fiveinrow' : 60,
                     },
                     '<:handsomesquidward:1066045471161856200>': {
                         'twoinrow' : 2,
-                        'threeinrow' : 5,
-                        'fourinrow' : 10,
-                        'fiveinrow' : 20
+                        'threeinrow' : 4,
+                        'fourinrow' : 24,
+                        'fiveinrow' : 120
                     },
                     '<:thanospog:782114477201555456>': {
-                        'twoinrow' : 5,
-                        'threeinrow' : 10,
-                        'fourinrow' : 20,
-                        'fiveinrow' : 40,
+                        'twoinrow' : 4,
+                        'threeinrow' : 8,
+                        'fourinrow' : 48,
+                        'fiveinrow' : 240,
                     },
                     '<a:raresheep:1145255369606709329>': {
                         'twoinrow' : 10,
-                        'threeinrow' : 20,
-                        'fourinrow' : 40,
-                        'fiveinrow' : 100,
+                        'threeinrow' : 50,
+                        'fourinrow' : 100,
+                        'fiveinrow' : 1000,
                     }
                 
                 }

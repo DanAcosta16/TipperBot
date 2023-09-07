@@ -2,3 +2,4 @@ config.json
 node_modules
 app-env
 database.sqlite
+127.0.0.1

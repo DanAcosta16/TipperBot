@@ -21,29 +21,22 @@ module.exports = {
             
             const robberUser = await Users.findOne({ where: { user_id: robber.id } });
             const victimUser = await Users.findOne({ where: { user_id: victim.id } });
-            if(robberUser.isInJail) {
-                const embed = new EmbedBuilder()
-                    .setColor('#FF0000')
-                    .setTitle('Error')
-                    .setDescription(`You can't rob someone while in jail.`);
-                await interaction.reply({ embeds: [embed], ephemeral: true });
-                return;
-            }
+            
             
             const now = Date.now();
             const last_rob_attempt = robberUser.last_rob_attempt;
             const timeSinceLastRobAttempt = now - last_rob_attempt;
             const oneDay = 1000 * 60 * 60 * 24;
-            // if (timeSinceLastRobAttempt < oneDay && last_rob_attempt !== null) {
-            //     const timeUntilCooldown = oneDay - timeSinceLastRobAttempt;
-            //     const timeUntilCooldownInHours = Math.round(timeUntilCooldown / 1000 / 60 / 60);
-            //     const embed = new EmbedBuilder()
-            //         .setColor('#FF0000')
-            //         .setTitle('Rob command on cooldown!')
-            //         .setDescription(`You already attempted robbery today. Try again in ${timeUntilCooldownInHours} hours.`);
-            //     await interaction.reply({ embeds: [embed], ephemeral: true });
-            //     return;
-            // }
+            if (timeSinceLastRobAttempt < oneDay && last_rob_attempt !== null) {
+                const timeUntilCooldown = oneDay - timeSinceLastRobAttempt;
+                const timeUntilCooldownInHours = Math.round(timeUntilCooldown / 1000 / 60 / 60);
+                const embed = new EmbedBuilder()
+                    .setColor('#FF0000')
+                    .setTitle('Rob command on cooldown!')
+                    .setDescription(`You already attempted robbery today. Try again in ${timeUntilCooldownInHours} hours.`);
+                await interaction.reply({ embeds: [embed], ephemeral: true });
+                return;
+            }
             if (robber.id === victim.id) {
                 const embed = new EmbedBuilder()
                     .setColor('#FF0000')
@@ -81,6 +74,15 @@ module.exports = {
                 return;      
             }
 
+            if(robberUser.isInJail) {
+                const embed = new EmbedBuilder()
+                    .setColor('#FF0000')
+                    .setTitle('Error')
+                    .setDescription(`You can't rob someone while in jail.`);
+                await interaction.reply({ embeds: [embed], ephemeral: true });
+                return;
+            }
+
 
 
             const wealthRatio = victimUser.balance / robberUser.balance;
@@ -106,8 +108,11 @@ module.exports = {
             }
             const suspicion = victimUser.suspicion_level;
             randomValue += suspicion;
+            if (victimUser.isInJail) {
+                randomValue -= 3;
+            }
             console.log('randomValue + modifiers: ' + randomValue);
-            if(randomValue < 5){
+            if(randomValue < 5 || robberUser.active_buff === 'Fedora'){
                 await victimUser.decrement('balance', { by: amount });
                 await victimUser.reload();
                 await robberUser.increment('balance', { by: amount });
@@ -141,6 +146,8 @@ module.exports = {
 
                 await updateFinancialStatus(interaction, [robber, victim]);
                 
+                await robberUser.update({ active_buff: null });
+                await robberUser.reload();
                 
                 
             }
@@ -174,7 +181,7 @@ module.exports = {
                     const jailEmbedEphemeral = new EmbedBuilder()
                         .setColor('#FF0000')
                         .setTitle('**Jailed!**')
-                        .setDescription(`Tipper has caught you in the act! You have been jailed. Days until release: ${robberUser.sentence_length}.\nType /getoutofjail to see your options.`);
+                        .setDescription(`Tipper has caught you in the act! You have been jailed. Days until release: ${robberUser.sentence_length}.\nType /leavejail to see your options.`);
                     await interaction.reply({ embeds: [jailEmbedEphemeral], ephemeral: true });
                 }
                 else{

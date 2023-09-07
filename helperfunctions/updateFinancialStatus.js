@@ -13,25 +13,25 @@ async function updateFinancialStatus(interaction, members = [interaction.user]) 
             if(userRecord.financial_status != 0) {
                 await userRecord.update({ financial_status: 0 });
                 await userRecord.reload();
-                embed.setTitle(`${user.tag}'s Financial Status Updated: **Poor**`);
-                embed.setColor('#FF0000');
-                await channel.send({ embeds: [embed] });
+                // embed.setTitle(`${user.tag}'s Financial Status Updated: **Poor**`);
+                // embed.setColor('#FF0000');
+                // await channel.send({ embeds: [embed] });
             }  
         } else if (userRecord.balance < 10000) {
             if(userRecord.financial_status != 1) {
                 await userRecord.update({ financial_status: 1 });
                 await userRecord.reload();
-                embed.setTitle(`${user.tag}'s Financial Status Updated: **Average**`);
-                embed.setColor('#FFFF00');
-                await channel.send({ embeds: [embed] });
+                // embed.setTitle(`${user.tag}'s Financial Status Updated: **Average**`);
+                // embed.setColor('#FFFF00');
+                // await channel.send({ embeds: [embed] });
             }    
         } else if (userRecord.balance < 100000) {
             if(userRecord.financial_status != 2) {
                 await userRecord.update({ financial_status: 2 });
                 await userRecord.reload();
-                embed.setTitle(`${user.tag}'s Financial Status Updated: **Wealthy**`);
-                embed.setColor('#00FF00');
-                await channel.send({ embeds: [embed] });
+                // embed.setTitle(`${user.tag}'s Financial Status Updated: **Wealthy**`);
+                // embed.setColor('#00FF00');
+                // await channel.send({ embeds: [embed] });
                 
             }
         }
@@ -39,9 +39,9 @@ async function updateFinancialStatus(interaction, members = [interaction.user]) 
             if(userRecord.financial_status != 3) {
                 await userRecord.update({ financial_status: 3 });
                 await userRecord.reload();
-                embed.setTitle(`${user.tag}'s Financial Status Updated: **Rich**`);
-                embed.setColor('#800080');
-                await channel.send({ embeds: [embed] });
+                // embed.setTitle(`${user.tag}'s Financial Status Updated: **Rich**`);
+                // embed.setColor('#800080');
+                // await channel.send({ embeds: [embed] });
             }
         }
     }

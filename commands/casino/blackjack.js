@@ -118,6 +118,7 @@ module.exports = {
                 .setDescription(`User ${interaction.user.id} is not registered.`);
 
             await interaction.editReply({ embeds: [embed] });
+            return;
         }
         
 }
