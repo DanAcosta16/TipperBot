@@ -18,50 +18,6 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.DATE,
             allowNull: true,
             defaultValue: null,
-        },
-        suspicion_level: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-            defaultValue: 0,
-        },
-        last_rob_attempt: {
-            type: DataTypes.DATE,
-            allowNull: true,
-            defaultValue: null
-        },
-        isInJail: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false
-        },
-        initialJailTime: {
-            type: DataTypes.DATE,
-            allowNull: true,
-            defaultValue: null
-        },
-        sentence_length: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-            defaultValue: null
-        },
-        financial_status: {
-            type: DataTypes.INTEGER,
-            allowNull: true,
-            defaultValue: 0
-        },
-        active_buff: {
-            type: DataTypes.STRING,
-            allowNull: true,
-            defaultValue: null
-        },
-        active_debuff: {
-            type: DataTypes.STRING,
-            allowNull: true,
-            defaultValue: null
-        },
-        last_robber_id: {
-            type: DataTypes.STRING,
-            allowNull: true,
-            defaultValue: null
         }
     }, { timestamps: false } 
     );

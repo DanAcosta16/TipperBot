@@ -8,13 +8,15 @@ const sequelize = require('../database.js');
 
 
 const Users = require('./Users.js')(sequelize, Sequelize.DataTypes);
-const Items = require('./Items.js')(sequelize, Sequelize.DataTypes);
-const UserItems = require('./UserItems.js')(sequelize, Sequelize.DataTypes);
+
+//This was used to give items to users but the idea was not fun but leaving here to reference
+// const Items = require('./Items.js')(sequelize, Sequelize.DataTypes);
+// const UserItems = require('./UserItems.js')(sequelize, Sequelize.DataTypes);
 
 
-Users.belongsToMany(Items, { through: UserItems });
-Items.belongsToMany(Users, { through: UserItems });
+// Users.belongsToMany(Items, { through: UserItems });
+// Items.belongsToMany(Users, { through: UserItems });
 
 
 
-module.exports = { Users, Items , UserItems };
+module.exports = { Users };

@@ -1,7 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { Users } = require('../../models/dbObjects');
 const { EmbedBuilder } = require('discord.js');
-const { updateFinancialStatus } = require('../../helperfunctions/updateFinancialStatus');
 
 
 module.exports = {
@@ -63,24 +62,6 @@ module.exports = {
                 await interaction.reply({ embeds: [embed]});
                 return;
             }
-
-            if (receiverUser.isInJail) {
-                const embed = new EmbedBuilder()
-                    .setColor('#FF0000')
-                    .setTitle('Error')
-                    .setDescription(`User ${receiver.tag} is in jail.`);
-                await interaction.reply({ embeds: [embed]});
-                return;
-            }
-
-            if (giverUser.isInJail) {
-                const embed = new EmbedBuilder()
-                    .setColor('#FF0000')
-                    .setTitle('Error')
-                    .setDescription(`User ${giver.tag} is in jail.`);
-                await interaction.reply({ embeds: [embed]});
-                return;
-            }
     
             await receiverUser.increment('balance', { by: amount });
             await receiverUser.reload();
@@ -92,8 +73,6 @@ module.exports = {
                 .setTitle('Money Given')
                 .setDescription(`${giver.tag}\'s Balance: $${giverUser.balance}\n${receiver.tag}\'s Balance: $${receiverUser.balance}`);
             await interaction.reply({ embeds: [embed]});
-
-            await updateFinancialStatus(interaction, [giver, receiver]);
 
         } catch (error) {
             console.error('Error giving money:', error);

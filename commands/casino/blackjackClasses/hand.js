@@ -4,12 +4,10 @@ const { Card } = require('./card.js');
 class Hand {
     constructor() {
         this.cards = [];
-        console.log("Hand created");
     }
 
     addCard(card) {
         this.cards.push(card);
-        console.log("Card added");
     }
 
     getTotalValue() {
@@ -19,16 +17,13 @@ class Hand {
         for (let card of this.cards) {
             if (faceCards.includes(card.value)){
                 totalValue += 10;
-                console.log("face card:" , `${totalValue}`);
             }
             else if (card.value === "Ace"){
                 numOfAces++;
                 totalValue += 11;
-                console.log("ace:" , `${totalValue}`);
             }
             else {
                 totalValue += parseInt(card.value);
-                console.log("number:" , `${totalValue}`);
             }
         }
         while (numOfAces > 0 && totalValue > 21) {

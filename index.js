@@ -2,8 +2,8 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const {Collection, Client, GatewayIntentBits, EmbedBuilder } = require('discord.js');
-const { token } = require('./config.json');
-// const token = process.env['token'];
+require('dotenv').config();
+const token = process.env.DISCORD_TOKEN;
 
 const { Player } = require('discord-player');
 const cron = require('node-cron');
@@ -20,46 +20,6 @@ const client = new Client({
 		GatewayIntentBits.GuildVoiceStates
     ] 
 });
-
-
-// ... Other imports and setup code ...
-
-// Run the task once a day at midnight
-cron.schedule('0 5 * * *', async () => {
-    try {
-        // Find all users in the database
-        const users = await Users.findAll();
-		let decreased = false;
-        // Update the suspicion level for each user
-        await Promise.all(users.map(async (user) => {
-            if (user.suspicion_level > 0) {
-                // Decrease the suspicion level by 1
-                await user.update({ suspicion_level: user.suspicion_level - 1 });
-				decreased = true;
-            }
-        }));
-
-		const channelId = '1145943213073502318';
-		const channel = client.channels.cache.get(channelId);
-
-		if (decreased) {
-			const embed = new EmbedBuilder()
-				.setColor('#00FF00')
-				.setTitle(`**Suspicion Level Decreased**`)
-				.setDescription(`The suspicion level of everyone in the database has been decreased by 1.`);
-			await channel.send({ embeds: [embed] });
-			console.log('Suspicion levels updated successfully.');
-		}
-		
-
-        
-    } catch (error) {
-        console.error('Error updating suspicion levels:', error);
-    }
-});
-
-// ... Rest of your application startup code ...
-
 
 
 const player = new Player(client);

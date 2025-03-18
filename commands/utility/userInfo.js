@@ -39,12 +39,6 @@ module.exports = {
         .setTitle('User Information')
         .addFields({ name: 'Username', value: `${selectedUser.username}`})
         .addFields({ name: 'User ID', value: `${selectedUser.user_id}`})
-        .addFields({ name: 'Suspicion Level', value: `${selectedUser.suspicion_level}`})
-        .addFields({ name: 'Jail', value: `${selectedUser.isInJail}`})
-        .addFields({ name: 'Financial Status', value: `${selectedUser.financial_status}`})
-        .addFields({ name: 'Active Debuff', value: `${selectedUser.active_debuff}`})
-        .addFields({ name: 'Active Buff', value: `${selectedUser.active_buff}`})
-        .addFields({ name: 'Sentence Length', value: `${selectedUser.sentence_length}`});
 
       await interaction.editReply({ embeds: [embed] });
     } catch (error) {

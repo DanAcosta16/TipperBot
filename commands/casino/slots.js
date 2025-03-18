@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Users } = require('../../models/dbObjects');
-const { updateFinancialStatus } = require('../../helperfunctions/updateFinancialStatus');
+
 module.exports = {
     cooldown: 5,
     data: new SlashCommandBuilder()
@@ -33,14 +33,6 @@ module.exports = {
         try {
 
             if(user){
-                if (user.isInJail) {
-                    const embed = new EmbedBuilder()
-                        .setColor('#FF0000')
-                        .setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
-                        .setTitle(`You can't play Slots while you're in jail.`)
-                    await interaction.editReply({ embeds: [embed] });
-                    return;
-                }
                 if (user.balance < bet) {
                     const embed = new EmbedBuilder()
                         .setColor('#FF0000')
@@ -123,7 +115,6 @@ module.exports = {
                     embed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                     
                     await interaction.followUp({ embeds: [embed] });
-                    await updateFinancialStatus(interaction);
 
                 }
                 else if (fourEmojisInARow) {
@@ -138,7 +129,6 @@ module.exports = {
                     embed.setColor('#00FF00');
                     embed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                     await interaction.followUp({ embeds: [embed] });
-                    await updateFinancialStatus(interaction);
                     
                 }
                 else if (threeEmojisInARow) {
@@ -162,7 +152,6 @@ module.exports = {
                         
                         embed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                         await interaction.followUp({ embeds: [embed] });
-                        await updateFinancialStatus(interaction);
                     }
                     else {
                         const scenario = 'threeinrow';
@@ -184,7 +173,6 @@ module.exports = {
                         
                         embed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                         await interaction.followUp({ embeds: [embed] });
-                        await updateFinancialStatus(interaction);
                     }
                 }
                 else if (twoEmojisInARow) {
@@ -209,7 +197,6 @@ module.exports = {
                         embed.setDescription(`Current Balance: $${user.balance}`);
                         embed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                         await interaction.followUp({ embeds: [embed] });
-                        await updateFinancialStatus(interaction);
                     }
                     else {
                         const scenario = 'twoinrow';
@@ -229,7 +216,6 @@ module.exports = {
                         embed.setDescription(`Current Balance: $${user.balance}`);
                         embed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                         await interaction.followUp({ embeds: [embed] });
-                        await updateFinancialStatus(interaction);
                     }
                 }
                 else {
@@ -242,7 +228,6 @@ module.exports = {
                     embed.setColor('#FF0000');
                     embed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                     await interaction.followUp({ embeds: [embed] });
-                    await updateFinancialStatus(interaction);
                 }
                 }
             // Generate the slots result
@@ -276,7 +261,6 @@ async function playSlots(interaction) {
         cumalativeSum += weights[i];
         cumulativeWeights.push(cumalativeSum);
     }
-    // const testEmojis = ['<a:raresheep:1145255369606709329>', '<a:raresheep:1145255369606709329>', '<a:raresheep:1145255369606709329>', '<a:raresheep:1145255369606709329>', '<a:raresheep:1145255369606709329>', '<a:raresheep:1145255369606709329>'];
     for (let i = 0; i < 5; i++) {
         const randomValue = Math.random() * cumalativeSum;
         let emojiId;
@@ -307,37 +291,12 @@ async function playSlots(interaction) {
         
     }
 
-    
-
-        // Edit the initial reply with the updated content
-
-    
-
     return result;
 }
 
 function TwoPairs(result) {
 
-    const emojiCounts = {};
     const pairs = [];
-
-    // for (const emoji of result) {
-    //     if (emojiCounts[emoji]) {
-    //         emojiCounts[emoji]++;
-    //         if (emojiCounts[emoji] === 2) {
-    //             pairs.push(emoji);
-    //             emojiCounts[emoji] = 0;
-    //         }
-    //     } else {
-    //         emojiCounts[emoji] = 1;
-    //     }
-    // }
-
-    // if (pairs.length === 2) {
-    //     return pairs.slice(0, 2);
-    // } else {
-    //     return null;
-    // }
 
     for (let i = 0; i < result.length - 1; i++) {
         if (result[i] === result[i + 1]) {
@@ -365,9 +324,6 @@ function TwoInARow(result) {
 function ThreeInARow(result) {
     for (let i = 0; i < result.length - 2; i++) {
         if (result[i] === result[i + 1] && result[i] === result[i + 2]) {
-            console.log(result[i]);
-            console.log(result[i + 1]);
-            console.log(result[i + 2]);
             return result[i]; // Found three matching symbols in a row
         }
     }

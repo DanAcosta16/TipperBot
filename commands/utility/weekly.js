@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, AttachmentBuilder } = require('discord.js');
-const { Users, Items, UserItems } = require('../../models/dbObjects'); 
-const { updateFinancialStatus } = require('../../helperfunctions/updateFinancialStatus');
+const { Users } = require('../../models/dbObjects'); 
 module.exports = {
     cooldown: 10,
     data: new SlashCommandBuilder()
@@ -15,7 +14,6 @@ module.exports = {
             const user = await Users.findOne({ where: { user_id: userId } });
 
             if (user) {
-                console.log(user.balance);
                 const now = Date.now();
                 
                 const lastWeeklyClaim = user.last_weekly_claim;
@@ -31,25 +29,6 @@ module.exports = {
                     .setTitle(`Weekly bonus received! 5000 tipperbucks.`)
                     .setDescription(`Balance: $${user.balance}`);
                     await interaction.editReply({ embeds: [embed] });
-                    await updateFinancialStatus(interaction);
-                    const tableCount = await Items.count();
-                    const randomItem = Math.ceil(Math.random() * tableCount);
-                    const item = await Items.findOne({ where: { id: randomItem } });
-                    const record = await UserItems.findOne({ where: { userUserId: userId, itemId: item.id } });
-                    if (record){
-                        await record.update({ quantity: record.quantity + 1 });
-                        await record.reload();
-                    }
-                    else{
-                        await user.addItem(item.id);
-                    }
-                    const file = new AttachmentBuilder('./assets/itemIcons/' + item.icon);
-                    const itemEmbed = new EmbedBuilder()
-                        .setColor('#00FF00')
-                        .setTitle(`You have received an item! ${item.name}`)
-                        .setDescription(`Description: ${item.description}`)
-                        .setImage('attachment://' + item.icon);
-                    await interaction.followUp({ embeds: [itemEmbed], files: [file], ephemeral: true });
                 } else {
                     const timeUntilCooldown = oneWeek - timeSinceLastWeeklyClaim;
                     const timeUntilCooldownInDays = Math.round(timeUntilCooldown / 1000 / 60 / 60 / 24);

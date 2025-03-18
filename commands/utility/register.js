@@ -25,7 +25,7 @@ module.exports = {
                     //set color to green
                     .setColor(0x00ff00)
                     .setTitle('Registration Successful')
-                    .setDescription('You have been registered with a balance of $500.')
+                    .setDescription('You have been registered with a balance of 500 tipperbucks.')
                 await interaction.editReply({ embeds: [embed] });
             } else {
                 const embed = new EmbedBuilder()

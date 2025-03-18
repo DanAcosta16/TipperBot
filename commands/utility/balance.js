@@ -15,7 +15,6 @@ module.exports = {
             const user = await Users.findOne({ where: { user_id: targetUser.id } });
 
             if (user) {
-                console.log(user.balance);
                 const embed = new EmbedBuilder()
                     .setColor('#00FF00')
                     .setTitle(`${targetUser.tag}'s Balance`)
