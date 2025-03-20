@@ -14,6 +14,7 @@
     "@discordjs/builders": "^1.6.5",
     "@discordjs/rest": "^1.7.1",
     "@discordjs/voice": "^0.16.0",
+    "@huggingface/inference": "^3.6.1",
     "axios": "^1.4.0",
     "discord-api-types": "^0.37.54",
     "discord-player": "^6.6.2",
