@@ -1,6 +1,8 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { Users } = require('../../models/dbObjects'); // Adjust the path to your dbInit.js file
 const { EmbedBuilder } = require('discord.js');
+const { MessageFlags } = require('discord-api-types/v10');
+require('dotenv').config();
 
 
 module.exports = {
@@ -12,8 +14,8 @@ module.exports = {
 
     async execute(interaction) {
         // Check if the user using the command is the allowed user
-        if (interaction.user.id !== '175086920513093633') {
-            await interaction.reply('You are not allowed to use this command.');
+        if (interaction.user.id !== process.env.DEVELOPER_ID) {
+            await interaction.reply({ content: 'You are not allowed to use this command.', flags: MessageFlags.Ephemeral });
             return;
         }
 
@@ -44,7 +46,7 @@ module.exports = {
                     .setTitle('User Not Found')
                     .setDescription(`User ${targetUser.tag} is not registered.`);
 
-                await interaction.reply({ embeds: [embed] });
+                await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
             }
         } catch (error) {
             console.error('Error setting balance:', error);
@@ -54,7 +56,7 @@ module.exports = {
                 .setTitle('Error')
                 .setDescription('An error occurred while setting the balance.');
 
-            await interaction.reply({ embeds: [embed] });
+            await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         }
     },
 };

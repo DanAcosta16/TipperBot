@@ -109,7 +109,7 @@ module.exports = {
                     
                     
 
-                    embed.setTitle(`Jackpot! +$${winnings}`);
+                    embed.setTitle(`Jackpot! Bet: $${bet} +$${winnings}`);
                     embed.setDescription(`Current Balance: $${user.balance}`);
                     embed.setColor('#00FF00');
                     embed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
@@ -124,8 +124,8 @@ module.exports = {
                     await user.increment('balance', { by: winnings });
                     await user.reload();
                     
-                    embed.setTitle(`You win! Four in a row! +$${winnings}`);
-                    embed.setDescription(`Current Balance: $${user.balance}`);
+                    embed.setTitle(`You win! Four in a row!`);
+                    embed.setDescription(`Bet: $${bet}\nMultiplier: ${multiplier}\nProfit: +$${winnings}\nCurrent Balance: $${user.balance}`);
                     embed.setColor('#00FF00');
                     embed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                     await interaction.followUp({ embeds: [embed] });
@@ -141,14 +141,15 @@ module.exports = {
                         await user.reload();
                         
                         if(winnings >= 0) {
-                            embed.setTitle(`You win! Full House! +$${winnings}`);
+                            embed.setTitle(`You win! Full House!`);
                             embed.setColor('#00FF00');
+                            embed.setDescription(`Bet: $${bet}\nMultiplier: ${multiplier}\nProfit: +$${winnings}\nCurrent Balance: $${user.balance}`);
                         }
                         else {
-                            embed.setTitle(`You lose! Full House! -$${Math.abs(winnings)}`);
+                            embed.setTitle(`You lose! Full House!`);
                             embed.setColor('#FF0000');
+                            embed.setDescription(`Bet: $${bet}\nMultiplier: ${multiplier}\nLoss: -$${Math.abs(winnings)}\nCurrent Balance: $${user.balance}`);
                         }
-                        embed.setDescription(`Current Balance: $${user.balance}`);
                         
                         embed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                         await interaction.followUp({ embeds: [embed] });
@@ -162,14 +163,15 @@ module.exports = {
                         
 
                         if(winnings >= 0) {
-                            embed.setTitle(`You win! Three in a row! +$${winnings}`);
+                            embed.setTitle(`You win! Three in a row!`);
                             embed.setColor('#00FF00');
+                            embed.setDescription(`Bet: $${bet}\nMultiplier: ${multiplier}\nProfit: +$${winnings}\nCurrent Balance: $${user.balance}`);
                         }
                         else {
-                            embed.setTitle(`You lose! Three in a row! -$${Math.abs(winnings)}`);
+                            embed.setTitle(`You lose! Three in a row!`);
                             embed.setColor('#FF0000');
+                            embed.setDescription(`Bet: $${bet}\nMultiplier: ${multiplier}\nLoss: -$${Math.abs(winnings)}\nCurrent Balance: $${user.balance}`);
                         }
-                        embed.setDescription(`Current Balance: $${user.balance}`);
                         
                         embed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                         await interaction.followUp({ embeds: [embed] });
@@ -186,15 +188,16 @@ module.exports = {
                         
 
                         if(winnings >= 0) {
-                            embed.setTitle(`You win! Two pair! +$${winnings}`);
+                            embed.setTitle(`You win! Two pair!`);
                             embed.setColor('#00FF00');
+                            embed.setDescription(`Bet: $${bet}\nMultiplier: ${multiplier}\nProfit: +$${winnings}\nCurrent Balance: $${user.balance}`);
                         }
                         else {
-                            embed.setTitle(`You lose! Two pair! -$${Math.abs(winnings)}`);
+                            embed.setTitle(`You lose! Two pair!`);
                             embed.setColor('#FF0000');
+                            embed.setDescription(`Bet: $${bet}\nMultiplier: ${multiplier}\nLoss: -$${Math.abs(winnings)}\nCurrent Balance: $${user.balance}`);
                         }
                         
-                        embed.setDescription(`Current Balance: $${user.balance}`);
                         embed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                         await interaction.followUp({ embeds: [embed] });
                     }
@@ -206,14 +209,15 @@ module.exports = {
                         await user.reload();
                          
                         if(winnings >= 0) {
-                            embed.setTitle(`You win! Two in a row! +$${winnings}`);
+                            embed.setTitle(`You win! Two in a row!`);
                             embed.setColor('#00FF00');
+                            embed.setDescription(`Bet: $${bet}\nMultiplier: ${multiplier}\nProfit: +$${winnings}\nCurrent Balance: $${user.balance}`);
                         }
                         else {
-                            embed.setTitle(`You lose! Two in a row! -$${Math.abs(winnings)}`);
+                            embed.setTitle(`You lose! Two in a row!`);
                             embed.setColor('#FF0000');
+                            embed.setDescription(`Bet: $${bet}\nMultiplier: ${multiplier}\nLoss: -$${Math.abs(winnings)}\nCurrent Balance: $${user.balance}`);
                         }
-                        embed.setDescription(`Current Balance: $${user.balance}`);
                         embed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                         await interaction.followUp({ embeds: [embed] });
                     }
@@ -223,8 +227,8 @@ module.exports = {
                     await user.reload();
                     
 
-                    embed.setTitle(`You lose! -$${bet}`);
-                    embed.setDescription(`Current Balance: $${user.balance}`);
+                    embed.setTitle(`You lose!`);
+                    embed.setDescription(`Bet: $${bet}\nLoss: -$${bet}\nCurrent Balance: $${user.balance}`);
                     embed.setColor('#FF0000');
                     embed.setAuthor({ name: interaction.user.username, iconURL: interaction.user.displayAvatarURL() })
                     await interaction.followUp({ embeds: [embed] });
@@ -286,7 +290,7 @@ async function playSlots(interaction) {
         }
         await delay(500);
         // result.push(testEmojis[i]);
-        await interaction.editReply(` ${result.join(' ')} `);
+        await interaction.editReply(`${result.join(' ')} `);
 
         
     }

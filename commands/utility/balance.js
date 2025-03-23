@@ -9,7 +9,7 @@ module.exports = {
 
     async execute(interaction) {
         const targetUser = interaction.options.getUser('user') || interaction.user;
-        await interaction.deferReply();
+        await interaction.deferReply({ephemeral: true});
         try {
             // Find the target user's data
             const user = await Users.findOne({ where: { user_id: targetUser.id } });

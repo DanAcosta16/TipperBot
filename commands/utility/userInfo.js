@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { Users } = require('../../models/dbObjects');
 const { EmbedBuilder } = require('discord.js');
+require('dotenv').config();
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -14,11 +15,11 @@ module.exports = {
 
   async execute(interaction) {
     const targetUser = interaction.options.getUser('user');
-    if(interaction.user.id != '175086920513093633'){
-      await interaction.reply('You do not have permission to use this command.');
+    await interaction.deferReply({ ephemeral: true });
+    if (interaction.user.id !== process.env.DEVELOPER_ID) {
+      await interaction.editReply({ content: 'You are not allowed to use this command.'});
       return;
     }
-    await interaction.deferReply({ ephemeral: true });
     
     try {
       

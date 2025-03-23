@@ -1,6 +1,7 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { Users } = require('../../models/dbObjects');
 const { EmbedBuilder } = require('discord.js');
+const { MessageFlags } = require('discord-api-types/v10');
 
 
 module.exports = {
@@ -32,7 +33,7 @@ module.exports = {
                     .setColor('#FF0000')
                     .setTitle('Error')
                     .setDescription(`You can't give tipperbucks to yourself.`);
-                    await interaction.reply({ embeds: [embed]});
+                    await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
                 return;
             }
 
@@ -41,7 +42,7 @@ module.exports = {
                     .setColor('#FF0000')
                     .setTitle('User Not Found')
                     .setDescription(`User ${giver.tag} is not registered.`);
-                await interaction.reply({ embeds: [embed]});
+                await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
                 return;
             }
     
@@ -50,7 +51,7 @@ module.exports = {
                     .setColor('#FF0000')
                     .setTitle('User Not Found')
                     .setDescription(`User ${receiver.tag} is not registered.`);
-                await interaction.reply({ embeds: [embed]});
+                await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
                 return;
             }
     
@@ -59,7 +60,7 @@ module.exports = {
                     .setColor('#FF0000')
                     .setTitle('Insufficient Funds')
                     .setDescription(`Balance: $${giverUser.balance}`);
-                await interaction.reply({ embeds: [embed]});
+                await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
                 return;
             }
     
@@ -71,7 +72,7 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setColor('#00FF00')
                 .setTitle('Money Given')
-                .setDescription(`${giver.tag}\'s Balance: $${giverUser.balance}\n${receiver.tag}\'s Balance: $${receiverUser.balance}`);
+                .setDescription(`${giver.tag} gave ${receiver.tag} $${amount}\n${giver.tag}\'s Balance: $${giverUser.balance}\n${receiver.tag}\'s Balance: $${receiverUser.balance}`);
             await interaction.reply({ embeds: [embed]});
 
         } catch (error) {
@@ -81,7 +82,7 @@ module.exports = {
                 .setTitle('Error')
                 .setDescription('An error occurred while giving tipperbucks.');
 
-            await interaction.reply({ embeds: [embed], ephemeral: true });
+            await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
         }
 
     }

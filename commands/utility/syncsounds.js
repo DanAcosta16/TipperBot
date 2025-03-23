@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('discord.js');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config();
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -9,7 +10,12 @@ module.exports = {
     .setDescription('Syncs all soundboard sounds from the server to your local folder'),
 
   async execute(interaction) {
+
     await interaction.deferReply({ ephemeral: true });
+    if (interaction.user.id !== process.env.DEVELOPER_ID) {
+      await interaction.editReply({ content: 'You are not allowed to use this command.'});
+      return;
+    }
 
     const guildId = interaction.guild.id;
     const botToken = process.env.DISCORD_TOKEN;

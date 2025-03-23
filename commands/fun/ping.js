@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
+const { MessageFlags } = require('discord-api-types/v10');
 
 module.exports = {
 	cooldown: 5,
@@ -6,6 +7,6 @@ module.exports = {
 		.setName('ping')
 		.setDescription('Replies with Pong!'),
 	async execute(interaction) {
-		await interaction.reply('Pong!');
+		await interaction.reply({ content: 'Pong!', flags: MessageFlags.Ephemeral });
 	}
 };

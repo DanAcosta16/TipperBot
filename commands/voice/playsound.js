@@ -2,9 +2,9 @@ const { SlashCommandBuilder } = require('discord.js');
 const { spawn } = require('child_process');
 const ffmpegPath = require('ffmpeg-static');
 const { joinVoiceChannel, createAudioPlayer, createAudioResource, AudioPlayerStatus } = require('@discordjs/voice');
+const { MessageFlags } = require('discord-api-types/v10');
 const path = require('path');
 const fs = require('fs');
-const { name } = require('../../events/interactionCreate');
 
 const effects = [
     { name: 'None', value: 'none' },
@@ -41,20 +41,23 @@ module.exports = {
     const results = files
         .filter(f => f.toLowerCase().includes(focused.toLowerCase()))
         .slice(0, 25)
-        .map(name => ({ name, value: name }));
+        .map(file => ({ 
+            name: file.replace(/\.ogg$/i, ''),
+            value: file
+        }));
 
     await interaction.respond(results);
   },
 
   
   async execute(interaction) {
+    
+    await interaction.deferReply({ephemeral: true});
     // Check if the user is in a voice channel
     const voiceChannel = interaction.member.voice.channel;
     if (!voiceChannel) {
-      return interaction.reply("You must be in a voice channel to use this command.");
+        return interaction.editReply({ content: "You must be in a voice channel to use this command."});
     }
-    
-    await interaction.deferReply();
 
     const sound = interaction.options.getString('sound');
     const effect = interaction.options.getString('effect') || 'none';
@@ -79,7 +82,7 @@ module.exports = {
     }
 
     const inputPath = path.join(__dirname, '../../assets/sounds/soundboard', sound);
-    const outputPath = path.join(__dirname, '../../temp', `processed_${Date.now()}.ogg`);
+    const outputPath = path.join(__dirname, '../../assets/sounds/temp', `processed_${Date.now()}.ogg`);
 
     const ffmpegArgs = ['-y', '-i', inputPath];
     if (ffmpegFilter) {
@@ -102,11 +105,8 @@ module.exports = {
 
         ffmpegProcess.on('close', (code) => {
             if (code === 0) {
-                console.log('FFmpeg process completed successfully');
-    
                 if (fs.existsSync(outputPath)) {
                     const stats = fs.statSync(outputPath);
-                    console.log(`File size: ${stats.size} bytes`);
                     if (stats.size === 0) {
                         console.log('File is empty');
                         return interaction.editReply('File is empty');
@@ -127,8 +127,13 @@ module.exports = {
     
                 // When playback finishes, cleanly disconnect from the voice channel
                 player.on(AudioPlayerStatus.Idle, () => {
-                    console.log('Playback finished');
                     connection.destroy();
+
+                    fs.unlink(outputPath, (err) => {
+                        if (err) {
+                            console.error(`Error deleting file: ${err.message}`);
+                        }
+                    })
                 });
             } else {
                 console.error(`FFmpeg process exited with code ${code}`);
